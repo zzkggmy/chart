@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -12,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +26,10 @@ public class PieChartView extends View {
     private float width = 0f;
     private float height = 0f;
     private Paint paint = new Paint();
+    private Paint withinPaint = new Paint();
+    private Paint textPaint = new Paint();
+    private Paint circlePaint = new Paint();
+    private Paint dividePaint = new Paint();
 
     private float allNum = 0F;
     private List<ViewData> datas = new ArrayList<>();
@@ -36,7 +38,7 @@ public class PieChartView extends View {
     private List<PieBaseData> pieList = new ArrayList<>();
     private float bigRadius = 0;
     private float circleRadius = 0;
-    private float bigCircleRadius = 0;
+    private float divideNum = 3;
 
     public PieChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -44,6 +46,18 @@ public class PieChartView extends View {
         paint.setAntiAlias(true);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
+        withinPaint.setAntiAlias(true);
+        withinPaint.setStyle(Paint.Style.FILL);
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setTextSize(20f);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setColor(Color.WHITE);
+        circlePaint.setStyle(Paint.Style.FILL);
+        dividePaint.setAntiAlias(true);
+        dividePaint.setColor(Color.TRANSPARENT);
+        dividePaint.setStyle(Paint.Style.FILL);
     }
 
 
@@ -68,8 +82,7 @@ public class PieChartView extends View {
         this.height = h;
         bigRadius = (Math.min(w, h)) / 2;
         radius = bigRadius - 30;
-        circleRadius = radius / 3;
-        bigCircleRadius = circleRadius + 30;
+        circleRadius = radius / 2;
     }
 
     @Override
@@ -80,38 +93,38 @@ public class PieChartView extends View {
 
     private void drawPieChart(Canvas canvas) {
         canvas.translate(width / 2, height / 2);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.GRAY);
-        canvas.drawRect(bigRadius, bigRadius, bigRadius, bigRadius, paint);
         RectF oval = new RectF(-radius, -radius, radius, radius);
         RectF oval1 = new RectF(-bigRadius, -bigRadius, bigRadius, bigRadius);
+        RectF oval2 = new RectF(-circleRadius - 25, -circleRadius - 25, circleRadius + 25, circleRadius + 25);
         float startAngle = 0;
         float sweepAngle;
         float textAngle;
         for (int i = 0; i < datas.size(); i++) {
-            paint.setColor(Color.WHITE);
-            canvas.drawArc(oval, startAngle, 5, true, paint);
-            startAngle += 5;
-            sweepAngle = (float) (datas.get(i).getPercent() / allNum * 325);
+            withinPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
             paint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
+            canvas.drawArc(oval, startAngle, divideNum, true, dividePaint);
+            startAngle += divideNum;
+            sweepAngle = (float) (datas.get(i).getPercent() / allNum * (360 - datas.size() * divideNum));
             PieBaseData pieBaseData = new PieBaseData();
             pieBaseData.setStartAngle(startAngle);
             pieBaseData.setSweepAngle(sweepAngle);
             pieList.add(pieBaseData);
+            paint.setAlpha(225);
             if (select)
                 canvas.drawArc(oval1, startAngle, sweepAngle, true, paint);
             else
                 canvas.drawArc(oval, startAngle, sweepAngle, true, paint);
+            withinPaint.setAlpha(10);
+            canvas.drawArc(oval2, startAngle, sweepAngle, true, withinPaint);
 //            //文字角度
 //            double textAngle = startAngle + sweepAngle / 2;
 //            float x = (float) (radius * Math.cos(textAngle * PI / 180));    //计算文字位置坐标
 //            float y = (float) (radius * Math.sin(textAngle * PI / 180));
-            textAngle = startAngle + sweepAngle / 2;
-            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
+//            textAngle = startAngle + sweepAngle / 2;
+//            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
             startAngle += sweepAngle;
         }
-        paint.setColor(Color.WHITE);
-        canvas.drawCircle(0, 0, circleRadius, paint);
+        canvas.drawCircle(0, 0, circleRadius, circlePaint);
     }
 
     public void setResource(List<ViewData> data) {
@@ -144,7 +157,7 @@ public class PieChartView extends View {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(30f);
-        canvas.drawText(text, dx, dy, paint);
+        canvas.drawText(text, dx, dy, textPaint);
 //            switch ((int) degree / 90) {
 //                //第一象限内
 //                case 0:
@@ -181,10 +194,5 @@ public class PieChartView extends View {
         }
         return super.onTouchEvent(event);
 
-    }
-
-    private float getPer(double data) {
-        BigDecimal bigDecimal = new BigDecimal(data);
-        return bigDecimal.setScale(2, BigDecimal.ROUND_CEILING).floatValue();
     }
 }
