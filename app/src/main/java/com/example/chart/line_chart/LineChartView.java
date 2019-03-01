@@ -13,6 +13,8 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.chart.LibUtils.dip2px;
+
 public class LineChartView extends View {
 
     private Context mContext;
@@ -55,7 +57,7 @@ public class LineChartView extends View {
         textPaint.setAntiAlias(true);
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(dip2px(12));
+        textPaint.setTextSize(dip2px(mContext,12));
     }
 
     @Override
@@ -70,11 +72,11 @@ public class LineChartView extends View {
         this.height = h;
         this.right = w;
         this.bottom = h;
-        this.startX = dip2px(50);
+        this.startX = dip2px(mContext,50);
         this.startY = height;
-        this.endX = width - dip2px(15);
-        this.endY = dip2px(20);
-        baseY = height - dip2px(30);
+        this.endX = width - dip2px(mContext,15);
+        this.endY = dip2px(mContext,20);
+        baseY = height - dip2px(mContext,30);
     }
 
     @Override
@@ -93,7 +95,7 @@ public class LineChartView extends View {
             textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
             float textWidth = rect.width();
             float textHeight = rect.height();
-            canvas.drawLine(startX + averageX * i, baseY, startX + averageX * i, baseY + dip2px(5), xPaint);
+            canvas.drawLine(startX + averageX * i, baseY, startX + averageX * i, baseY + dip2px(mContext,5), xPaint);
             canvas.drawText("" + (averageNum * i), startX + averageX * i - textWidth / 2, startY - textHeight / 2, textPaint);
         }
     }
@@ -106,13 +108,13 @@ public class LineChartView extends View {
             textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
             float textWidth = rect.width();
             float textHeight = rect.height();
-            canvas.drawLine(startX, baseY - averageY * i, startX - dip2px(5), baseY - averageY * i, yPaint);
+            canvas.drawLine(startX, baseY - averageY * i, startX - dip2px(mContext,5), baseY - averageY * i, yPaint);
             canvas.drawText(String.valueOf(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, textPaint);
         }
     }
 
     private void drawLine(Canvas canvas) {
-        linePaint.setStrokeWidth(dip2px(2));
+        linePaint.setStrokeWidth(dip2px(mContext,2));
         float itemHeight = (baseY - endY) / datas.size();
         float averageX = (endX - startX) / (datas.size() - 1);
         double averageYNum = maxNum / datas.size();
@@ -135,11 +137,6 @@ public class LineChartView extends View {
         this.yAxis = lineChartBean.getyAxis();
         this.xAxisMaxNum = lineChartBean.getxAxisMaxNum();
         this.yAxisMaxNum = lineChartBean.getyAxisMaxNum();
-    }
-
-    public float dip2px(double dpValue) {
-        final float scale = mContext.getResources().getDisplayMetrics().density;
-        return (float) (dpValue * scale + 0.5d);
     }
 
 }

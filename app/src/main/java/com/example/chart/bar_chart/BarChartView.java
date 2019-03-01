@@ -14,6 +14,8 @@ import com.example.chart.pie_chart.BarChartBean;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.chart.LibUtils.dip2px;
+
 public class BarChartView extends View {
     private Context mContext;
 
@@ -53,8 +55,8 @@ public class BarChartView extends View {
         textPaint.setAntiAlias(true);
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(dip2px(12));
-        barWidth = dip2px(20);
+        textPaint.setTextSize(dip2px(mContext,12));
+        barWidth = dip2px(mContext,20);
     }
 
     @Override
@@ -69,11 +71,11 @@ public class BarChartView extends View {
         this.height = h;
         this.right = w;
         this.bottom = h;
-        this.startX = dip2px(50);
+        this.startX = dip2px(mContext,50);
         this.startY = height;
-        this.endX = width - dip2px(15);
-        this.endY = dip2px(10);
-        baseY = height - dip2px(30);
+        this.endX = width - dip2px(mContext,15);
+        this.endY = dip2px(mContext,10);
+        baseY = height - dip2px(mContext,30);
     }
 
     @Override
@@ -91,7 +93,7 @@ public class BarChartView extends View {
             textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
             float textWidth = rect.width();
             float textHeight = rect.height();
-            canvas.drawLine(startX + averageX * (i + 1), baseY, startX + averageX * (i + 1), baseY + dip2px(5), xPaint);
+            canvas.drawLine(startX + averageX * (i + 1), baseY, startX + averageX * (i + 1), baseY + dip2px(mContext,5), xPaint);
             canvas.drawText("" + (i + 1), startX + averageX * (i + 1) - textWidth / 2, startY - textHeight / 2, textPaint);
         }
     }
@@ -105,14 +107,14 @@ public class BarChartView extends View {
             float textWidth = rect.width();
             float textHeight = rect.height();
             canvas.drawText(String.valueOf(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, textPaint);
-            canvas.drawLine(startX, baseY - i * averageY, startX - dip2px(5), baseY - i * averageY, yPaint);
+            canvas.drawLine(startX, baseY - i * averageY, startX - dip2px(mContext,5), baseY - i * averageY, yPaint);
         }
     }
 
     private void drawBar(Canvas canvas) {
         float averageX = (endX - startX) / (datas.size() + 1);
         float averageY = (baseY - endY);
-        textPaint.setTextSize(dip2px(10));
+        textPaint.setTextSize(dip2px(mContext,10));
         for (int i = 0; i < datas.size(); i++) {
             textPaint.getTextBounds(String.valueOf(datas.get(i).getNum()), 0, String.valueOf(datas.get(i).getNum()).length(), rect);
             float textWidth = rect.width();
@@ -131,10 +133,5 @@ public class BarChartView extends View {
             if (value.getNum() > maxNum) maxNum = value.getNum();
         }
         maxNum = maxNum + 3;
-    }
-
-    public float dip2px(double dpValue) {
-        final float scale = mContext.getResources().getDisplayMetrics().density;
-        return (float) (dpValue * scale + 0.5d);
     }
 }
