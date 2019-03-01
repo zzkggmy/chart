@@ -1,4 +1,4 @@
-package com.example.chart;
+package com.example.chart.pie_chart;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -117,11 +117,12 @@ public class PieChartView extends View {
             withinPaint.setAlpha(10);
             canvas.drawArc(oval2, startAngle, sweepAngle, true, withinPaint);
 //            //文字角度
-//            double textAngle = startAngle + sweepAngle / 2;
+//            textAngle = startAngle + sweepAngle / 2;
 //            float x = (float) (radius * Math.cos(textAngle * PI / 180));    //计算文字位置坐标
 //            float y = (float) (radius * Math.sin(textAngle * PI / 180));
-//            textAngle = startAngle + sweepAngle / 2;
-//            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
+////            textAngle = startAngle + sweepAngle / 2;
+////            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
+//            canvas.drawText("这是第" + (i + 1) + "条数据",x / 2,y,textPaint);
             startAngle += sweepAngle;
         }
         canvas.drawCircle(0, 0, circleRadius, circlePaint);

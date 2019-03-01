@@ -3,26 +3,55 @@ package com.example.chart;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import java.math.BigDecimal;
+import com.example.chart.bar_chart.BarChartView;
+import com.example.chart.line_chart.LineChartBean;
+import com.example.chart.line_chart.LineChartView;
+import com.example.chart.pie_chart.BarChartBean;
+import com.example.chart.pie_chart.PieChartView;
+import com.example.chart.pie_chart.ViewData;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private int[] colors = {R.color.color_e10000, R.color.color_ff6060, R.color.color_628ef9_20, R.color.color_73dc1d, R.color.color_3ebfff, R.color.color_BD10E0, R.color.color_565759};
-    private Double[] nums = {10.5, 33.6, 14d, 13.6, 17.8, 20d, 60d};
+    private int[] colors = {R.color.color_e10000, R.color.color_ff6060, R.color.color_628ef9_20, R.color.color_73dc1d, R.color.color_3ebfff, R.color.color_BD10E0, R.color.color_565759,R.color.blue_1,R.color.yellow_1};
+    private Double[] nums = {30.5, 33.6, 19d, 13.6, 17.8, 20d, 60d,45d,65d};
     private List<ViewData> list = new ArrayList<>();
+    private List<BarChartBean.DataBean> barList = new ArrayList<>();
+    private BarChartBean barChartBean = new BarChartBean();
+
+    private List<LineChartBean.DataBean> lineList = new ArrayList<>();
+    private LineChartBean lineChartBean = new LineChartBean();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PieChartView pieChartView = findViewById(R.id.pie_chart);
+        BarChartView barChartView = findViewById(R.id.bar_chart);
+        LineChartView lineChartView = findViewById(R.id.line_chart);
         for (int i = 0; i < colors.length; i++) {
             ViewData bean = new ViewData();
             bean.setColor(colors[i]);
             bean.setPercent(nums[i]);
             list.add(bean);
+            BarChartBean.DataBean dataBean = new BarChartBean.DataBean();
+            dataBean.setColor(colors[i]);
+            dataBean.setNum(nums[i]);
+            barList.add(dataBean);
+
+            LineChartBean.DataBean lineBean = new LineChartBean.DataBean();
+            lineBean.setColor(colors[i]);
+            lineBean.setNum(nums[i]);
+            lineList.add(lineBean);
         }
+        lineChartBean.setxAxis(5);
+        lineChartBean.setyAxis(5);
+        barChartBean.setDatas(barList);
+        lineChartBean.setDatas(lineList);
+        lineChartBean.setxAxisMaxNum(100);
         pieChartView.setResource(list);
+        barChartView.setData(barChartBean);
+        lineChartView.setData(lineChartBean);
     }
 }

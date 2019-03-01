@@ -1,4 +1,4 @@
-package com.example.chart;
+package com.example.chart.pie_chart;
 
 public class PieBaseData {
     private float startAngle;
