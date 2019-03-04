@@ -6,6 +6,24 @@ public class LineChartBean {
     private double xAxis;
     private double yAxis;
     private double xAxisMaxNum;
+    private double selectPaintWidth;
+    private int selectPaintColor;
+
+    public double getSelectPaintWidth() {
+        return selectPaintWidth;
+    }
+
+    public void setSelectPaintWidth(double selectPaintWidth) {
+        this.selectPaintWidth = selectPaintWidth;
+    }
+
+    public int getSelectPaintColor() {
+        return selectPaintColor;
+    }
+
+    public void setSelectPaintColor(int selectPaintColor) {
+        this.selectPaintColor = selectPaintColor;
+    }
 
     public double getxAxisMaxNum() {
         return xAxisMaxNum;

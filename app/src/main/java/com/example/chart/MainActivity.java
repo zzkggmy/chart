@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         barChartBean.setyScale(4);
         barChartBean.setBarWidth(20);
         barChartBean.setSelectType(BarChartBean.SelectType.zoom);
+        lineChartBean.setSelectPaintColor(this.getResources().getColor(R.color.color_BD10E0));
+        lineChartBean.setSelectPaintWidth(2);
         pieChartView.setResource(list);
         barChartView.setData(barChartBean);
         lineChartView.setData(lineChartBean);
