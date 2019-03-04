@@ -35,15 +35,17 @@ public class BarChartView extends View {
     private Paint yPaint = new Paint();
     private Paint barPaint = new Paint();
     private Paint textPaint = new Paint();
+    private Paint axisTextPaint = new Paint();
+    private Paint selectPaint = new Paint();
     private List<BarChartBean.DataBean> datas = new ArrayList<>();
     private Rect rect = new Rect();
     private double maxNum = 0;
     private float barWidth;
     private int yScale = 5;
     private int index = -1;
-    private Paint selectPaint = new Paint();
     private BarChartBean.SelectType selectType;
     private float averageX = 0;
+    private boolean clickEnable = true;
 
 
     public BarChartView(Context context, @Nullable AttributeSet attrs) {
@@ -66,6 +68,8 @@ public class BarChartView extends View {
         selectPaint.setAntiAlias(true);
         selectPaint.setStyle(Paint.Style.STROKE);
         selectPaint.setStrokeWidth(dip2px(context, 2));
+        axisTextPaint.setAntiAlias(true);
+        axisTextPaint.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -103,7 +107,7 @@ public class BarChartView extends View {
             float textWidth = rect.width();
             float textHeight = rect.height();
             canvas.drawLine(startX + averageX * (i + 1), baseY, startX + averageX * (i + 1), baseY + dip2px(mContext, 5), xPaint);
-            canvas.drawText("" + (i + 1), startX + averageX * (i + 1) - textWidth / 2, startY - textHeight / 2, textPaint);
+            canvas.drawText("" + (i + 1), startX + averageX * (i + 1) - textWidth / 2, startY - textHeight / 2, axisTextPaint);
         }
     }
 
@@ -115,7 +119,7 @@ public class BarChartView extends View {
             textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
             float textWidth = rect.width();
             float textHeight = rect.height();
-            canvas.drawText(String.valueOf(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, textPaint);
+            canvas.drawText(String.valueOf(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, axisTextPaint);
             canvas.drawLine(startX, baseY - i * averageY, startX - dip2px(mContext, 5), baseY - i * averageY, yPaint);
         }
     }
@@ -130,21 +134,23 @@ public class BarChartView extends View {
             textPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
             barPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
             if (index == i) {
-                switch (selectType) {
-                    case zoom:
-                        canvas.drawRect(startX + averageX * (i + 1) - barWidth  - dip2px(mContext, 3), (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY) - dip2px(mContext, 3), startX + averageX * (i + 1) + barWidth + dip2px(mContext, 3), baseY, barPaint);
-                        break;
-                    case round:
-                        Path path = new Path();
-                        path.rMoveTo(startX + averageX * (i + 1) - barWidth, baseY);
-                        path.lineTo(startX + averageX * (i + 1) - barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY));
-                        path.lineTo(startX + averageX * (i + 1) + barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY));
-                        path.lineTo(startX + averageX * (i + 1) + barWidth, baseY);
-                        canvas.drawPath(path, selectPaint);
-                        canvas.drawRect(startX + averageX * (i + 1) - barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY), startX + averageX * (i + 1) + barWidth, baseY, barPaint);
-                        break;
+                if (clickEnable) {
+                    switch (selectType) {
+                        case zoom:
+                            canvas.drawRect(startX + averageX * (i + 1) - barWidth - dip2px(mContext, 3), (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY) - dip2px(mContext, 3), startX + averageX * (i + 1) + barWidth + dip2px(mContext, 3), baseY, barPaint);
+                            break;
+                        case round:
+                            Path path = new Path();
+                            path.rMoveTo(startX + averageX * (i + 1) - barWidth, baseY);
+                            path.lineTo(startX + averageX * (i + 1) - barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY));
+                            path.lineTo(startX + averageX * (i + 1) + barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY));
+                            path.lineTo(startX + averageX * (i + 1) + barWidth, baseY);
+                            canvas.drawPath(path, selectPaint);
+                            canvas.drawRect(startX + averageX * (i + 1) - barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY), startX + averageX * (i + 1) + barWidth, baseY, barPaint);
+                            break;
+                    }
+                    canvas.drawText(String.valueOf(datas.get(i).getNum()), startX + averageX * (i + 1) - textWidth / 2, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY) - textHeight / 2 - dip2px(mContext, 3) - dip2px(mContext, 3), textPaint);
                 }
-                canvas.drawText(String.valueOf(datas.get(i).getNum()), startX + averageX * (i + 1) - textWidth / 2, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY) - textHeight / 2 - dip2px(mContext, 3) - dip2px(mContext, 3), textPaint);
 
             } else {
                 canvas.drawRect(startX + averageX * (i + 1) - barWidth, (float) (baseY - (float) (datas.get(i).getNum()) / maxNum * averageY), startX + averageX * (i + 1) + barWidth, baseY, barPaint);
@@ -186,5 +192,9 @@ public class BarChartView extends View {
         this.yScale = barChartBean.getyScale();
         this.barWidth = dip2px(mContext, barChartBean.getBarWidth()) / 2;
         this.selectType = barChartBean.getSelectType();
+        this.axisTextPaint.setColor(barChartBean.getAxisTextColor());
+        this.axisTextPaint.setTextSize(dip2px(mContext, barChartBean.getAxisTextSize()));
+        this.clickEnable = barChartBean.isClickEnable();
+        this.selectType = barChartBean.getSelectType() == null? BarChartBean.SelectType.zoom:barChartBean.getSelectType();
     }
 }

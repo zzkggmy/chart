@@ -6,8 +6,38 @@ public class LineChartBean {
     private double xAxis;
     private double yAxis;
     private double xAxisMaxNum;
+    private double yAxisMaxNum;
+    private List<DataBean> datas;
+    private int lineColor;
+    private SelectType selectType = SelectType.point;
+    private boolean clickEnable = true;
+
+    public boolean isClickEnable() {
+        return clickEnable;
+    }
+
+    public void setClickEnable(boolean clickEnable) {
+        this.clickEnable = clickEnable;
+    }
+
+    public SelectType getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(SelectType selectType) {
+        this.selectType = selectType;
+    }
+
     private double selectPaintWidth;
     private int selectPaintColor;
+
+    public int getLineColor() {
+        return lineColor;
+    }
+
+    public void setLineColor(int lineColor) {
+        this.lineColor = lineColor;
+    }
 
     public double getSelectPaintWidth() {
         return selectPaintWidth;
@@ -40,9 +70,6 @@ public class LineChartBean {
     public void setyAxisMaxNum(double yAxisMaxNum) {
         this.yAxisMaxNum = yAxisMaxNum;
     }
-
-    private double yAxisMaxNum;
-    private List<DataBean> datas;
 
     public double getxAxis() {
         return xAxis;
@@ -87,5 +114,10 @@ public class LineChartBean {
         public void setColor(int color) {
             this.color = color;
         }
+    }
+
+    public enum SelectType{
+        all,
+        point;
     }
 }

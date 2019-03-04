@@ -5,11 +5,40 @@ import java.util.List;
 public class BarChartBean {
     private double xAxisNum;
     private double yAxisNum;
-    private List<Integer> barColors;
     private float barWidth;
     private int yScale;
+    private float axisTextSize;
+    private int axisTextColor;
+    private SelectType selectType = SelectType.zoom;
+    private boolean clickEnable = true;
 
-    private SelectType selectType;
+    public boolean isClickEnable() {
+        return clickEnable;
+    }
+
+    public void setClickEnable(boolean clickEnable) {
+        this.clickEnable = clickEnable;
+    }
+
+    public List<DataBean> getDatas() {
+        return datas;
+    }
+
+    public float getAxisTextSize() {
+        return axisTextSize;
+    }
+
+    public void setAxisTextSize(float axisTextSize) {
+        this.axisTextSize = axisTextSize;
+    }
+
+    public int getAxisTextColor() {
+        return axisTextColor;
+    }
+
+    public void setAxisTextColor(int axisTextColor) {
+        this.axisTextColor = axisTextColor;
+    }
 
     public SelectType getSelectType() {
         return selectType;
@@ -45,20 +74,8 @@ public class BarChartBean {
         this.yAxisNum = yAxisNum;
     }
 
-    public List<DataBean> getDatas() {
-        return datas;
-    }
-
     public void setDatas(List<DataBean> datas) {
         this.datas = datas;
-    }
-
-    public List<Integer> getBarColors() {
-        return barColors;
-    }
-
-    public void setBarColors(List<Integer> barColors) {
-        this.barColors = barColors;
     }
 
     public float getBarWidth() {

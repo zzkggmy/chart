@@ -10,9 +10,14 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
+import com.example.chart.XAxisFormat;
+import com.example.chart.YAxisFormat;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import static com.example.chart.LibUtils.dip2px;
@@ -46,6 +51,13 @@ public class LineChartView extends View {
     private int index = -1;
     private float itemHeight = 0;
     private Paint selectPaint = new Paint();
+    private XAxisFormat xAxisFormat;
+    private YAxisFormat yAxisFormat;
+    private LineChartBean.SelectType selectType;
+    private boolean clickEnable = true;
+    private float touchX = 0;
+    private float touchY = 0;
+
 
     public LineChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -103,7 +115,7 @@ public class LineChartView extends View {
             float textWidth = rect.width();
             float textHeight = rect.height();
             canvas.drawLine(startX + averageX * i, baseY, startX + averageX * i, baseY + dip2px(mContext, 5), xPaint);
-            canvas.drawText("" + (averageNum * i), startX + averageX * i - textWidth / 2, startY - textHeight / 2, textPaint);
+            canvas.drawText(roundFormat(averageNum * i), startX + averageX * i - textWidth / 2, startY - textHeight / 2, textPaint);
         }
     }
 
@@ -116,7 +128,23 @@ public class LineChartView extends View {
             float textWidth = rect.width();
             float textHeight = rect.height();
             canvas.drawLine(startX, baseY - averageY * i, startX - dip2px(mContext, 5), baseY - averageY * i, yPaint);
-            canvas.drawText(String.valueOf(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, textPaint);
+            canvas.drawText(roundFormat(averageNum * i), textWidth / 2, baseY - averageY * i + textHeight / 2, textPaint);
+        }
+    }
+
+    public void xAxisFormat(XAxisFormat xAxisFormat) {
+        if (this.xAxisFormat == null) {
+            this.xAxisFormat = this::roundFormat;
+        } else {
+            this.xAxisFormat = xAxisFormat;
+        }
+    }
+
+    public void yAxisFormat(YAxisFormat yAxisFormat) {
+        if (this.yAxisFormat == null) {
+            this.yAxisFormat = this::roundFormat;
+        } else {
+            this.yAxisFormat = yAxisFormat;
         }
     }
 
@@ -128,8 +156,17 @@ public class LineChartView extends View {
         path.rMoveTo(startX, (float) (baseY - datas.get(0).getNum() / averageYNum * itemHeight));
         for (int i = 0; i < datas.size(); i++) {
             path.lineTo(startX + i * averageX, (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight));
-            if (index == i) {
-                canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY, selectPaint);
+            if (clickEnable) {
+                switch (selectType) {
+                    case all:
+                        canvas.drawLine(touchX, baseY, touchX, endY, selectPaint);
+                        break;
+                    case point:
+                        if (index == i) {
+                            canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY, selectPaint);
+                        }
+                        break;
+                }
             }
         }
         canvas.drawPath(path, linePaint);
@@ -147,9 +184,21 @@ public class LineChartView extends View {
                 float x = event.getX();
                 float y = event.getY();
                 for (int i = 0; i < datas.size(); i++) {
-                    if (x <= startX + i * averageX + dip2px(mContext, 8) && x >= startX + i * averageX - dip2px(mContext, 8)) {
-                        if (y <= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) + dip2px(mContext, 8) && y >= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) - dip2px(mContext, 8))
-                            index = i;
+                    switch (selectType) {
+                        case point:
+                            if (x <= startX + i * averageX + dip2px(mContext, 8) && x >= startX + i * averageX - dip2px(mContext, 8)) {
+                                if (y <= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) + dip2px(mContext, 8) && y >= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) - dip2px(mContext, 8))
+                                    index = i;
+                            }
+                            break;
+                        case all:
+                            if (x >= startX && x <= endX) {
+                                if (y >= endY && y <= baseY) {
+                                    touchX = x;
+                                    touchY = y;
+                                }
+                            }
+                            break;
                     }
                 }
                 invalidate();
@@ -171,8 +220,15 @@ public class LineChartView extends View {
         this.yAxis = lineChartBean.getyAxis();
         this.xAxisMaxNum = lineChartBean.getxAxisMaxNum();
         this.yAxisMaxNum = lineChartBean.getyAxisMaxNum();
-        selectPaint.setStrokeWidth(dip2px(mContext,lineChartBean.getSelectPaintWidth()));
+        linePaint.setColor(lineChartBean.getLineColor());
+        selectPaint.setStrokeWidth(dip2px(mContext, lineChartBean.getSelectPaintWidth()));
         selectPaint.setColor(lineChartBean.getSelectPaintColor());
+        this.selectType = lineChartBean.getSelectType() == null ? LineChartBean.SelectType.point: lineChartBean.getSelectType();
+        this.clickEnable = lineChartBean.isClickEnable();
     }
 
+    private String roundFormat(Double value) {
+        BigDecimal b = new BigDecimal(value);
+        return b.setScale(1, RoundingMode.HALF_UP).toString();
+    }
 }
