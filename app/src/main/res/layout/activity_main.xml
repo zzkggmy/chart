@@ -4,16 +4,16 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_gravity="center"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="100dp">
 
         <com.example.chart.pie_chart.PieChartView
-            android:layout_marginTop="100dp"
             android:id="@+id/pie_chart"
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
             android:layout_height="300dp" />
 
         <com.example.chart.bar_chart.BarChartView

@@ -1,4 +1,4 @@
-package com.example.chart.pie_chart;
+package com.example.chart.bar_chart;
 
 import java.util.List;
 
@@ -7,6 +7,25 @@ public class BarChartBean {
     private double yAxisNum;
     private List<Integer> barColors;
     private float barWidth;
+    private int yScale;
+
+    private SelectType selectType;
+
+    public SelectType getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(SelectType selectType) {
+        this.selectType = selectType;
+    }
+
+    public int getyScale() {
+        return yScale;
+    }
+
+    public void setyScale(int yScale) {
+        this.yScale = yScale;
+    }
 
     private List<DataBean> datas;
 
@@ -69,5 +88,10 @@ public class BarChartBean {
         public void setColor(int color) {
             this.color = color;
         }
+    }
+
+    public enum SelectType{
+        round,
+        zoom;
     }
 }

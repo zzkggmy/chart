@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.example.chart.bar_chart.BarChartView;
 import com.example.chart.line_chart.LineChartBean;
 import com.example.chart.line_chart.LineChartView;
-import com.example.chart.pie_chart.BarChartBean;
+import com.example.chart.bar_chart.BarChartBean;
 import com.example.chart.pie_chart.PieChartView;
 import com.example.chart.pie_chart.ViewData;
 
@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
             dataBean.setColor(colors[i]);
             dataBean.setNum(nums[i]);
             barList.add(dataBean);
-
             LineChartBean.DataBean lineBean = new LineChartBean.DataBean();
             lineBean.setColor(colors[i]);
             lineBean.setNum(nums[i]);
@@ -50,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         barChartBean.setDatas(barList);
         lineChartBean.setDatas(lineList);
         lineChartBean.setxAxisMaxNum(100);
+        barChartBean.setyScale(4);
+        barChartBean.setBarWidth(20);
+        barChartBean.setSelectType(BarChartBean.SelectType.zoom);
         pieChartView.setResource(list);
         barChartView.setData(barChartBean);
         lineChartView.setData(lineChartBean);
