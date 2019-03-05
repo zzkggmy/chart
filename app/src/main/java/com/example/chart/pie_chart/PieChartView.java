@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -116,8 +117,9 @@ public class PieChartView extends View {
                 canvas.drawArc(oval, startAngle, sweepAngle, true, paint);
             withinPaint.setAlpha(10);
             canvas.drawArc(oval2, startAngle, sweepAngle, true, withinPaint);
-//            //文字角度
-//            textAngle = startAngle + sweepAngle / 2;
+            //文字角度
+            textAngle = startAngle + sweepAngle / 2;
+            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
 //            float x = (float) (radius * Math.cos(textAngle * PI / 180));    //计算文字位置坐标
 //            float y = (float) (radius * Math.sin(textAngle * PI / 180));
 ////            textAngle = startAngle + sweepAngle / 2;
@@ -140,21 +142,21 @@ public class PieChartView extends View {
     public void getTextPoint(float degree, Canvas canvas, String text) {
         float dx;
         float dy;
-//        if (degree >= 0 && degree <= 90) {
-//            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));//注意Math.sin(x)中x为弧度值，并非数学中的角度，所以需要将角度转换为弧度
-//            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
-//        } else if (degree > 90 && degree <= 180) {
-//            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (180f - degree)));
-//            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (180f - degree)));
-//        } else if (degree > 180 && degree <= 270) {
-//            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (270f - degree)));
-//            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (270f - degree)));
-//        } else {
-//            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (360f - degree)));
-//            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (360f - degree)));
-//        }
-        dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));
-        dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
+        if (degree >= 0 && degree <= 90) {
+            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));//注意Math.sin(x)中x为弧度值，并非数学中的角度，所以需要将角度转换为弧度
+            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
+        } else if (degree > 90 && degree <= 180) {
+            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (180f - degree)));
+            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (180f - degree)));
+        } else if (degree > 180 && degree <= 270) {
+            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (270f - degree)));
+            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (270f - degree)));
+        } else {
+            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (360f - degree)));
+            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (360f - degree)));
+        }
+//        dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));
+//        dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(30f);
@@ -188,10 +190,69 @@ public class PieChartView extends View {
         float x = event.getX();
         float y = event.getY();
 
-        if (x >= 0 && y >= 0) {
-            select = !select;
-            Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
-            invalidate();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_DOWN:
+                float startAngle = 0;
+                float sweepAngle;
+                Log.d("x + y  " ,"X :  " + x  + "Y : " + y);
+//                for (int i = 0; i < datas.size(); i++) {
+//                    startAngle += divideNum;
+//                    sweepAngle = (float) (datas.get(i).getPercent() / allNum * (360 - datas.size() * divideNum));
+//
+//                    startAngle += sweepAngle;
+//                    switch ((int) startAngle / 90) {
+//                        //第一象限内
+//                        case 0:
+//                            Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
+////                            p.x = (radius * (float) Math.cos(Math.toRadians(degree)));
+////                            p.y = (radius * (float) Math.sin(Math.toRadians(degree)));
+//                            break;
+//                        //第二象限内
+//                        case 1:
+//                            Toast.makeText(mContext, "第二象限", Toast.LENGTH_SHORT).show();
+////                            p.x = (radius * (float) Math.sin(Math.toRadians(degree - 90)));
+////                            p.y = (radius * (float) Math.cos(Math.toRadians(degree - 90)));
+//                            break;
+//                        //第三象限内
+//                        case 2:
+//                            Toast.makeText(mContext, "第三象限", Toast.LENGTH_SHORT).show();
+////                            p.x = (radius * (float) Math.cos(Math.toRadians(degree - 180)));
+////                            p.y = (radius * (float) Math.sin(Math.toRadians(degree - 180)));
+//                            break;
+//                        //第四象限内
+//                        case 3:
+//                            Toast.makeText(mContext, "第四象限", Toast.LENGTH_SHORT).show();
+////                            p.x = radius * (float) Math.sin(Math.toRadians(degree - 270));
+////                            p.y = radius * (float) Math.cos(Math.toRadians(degree - 270));
+//                            break;
+//                    }
+//                }
+
+//                if (x >= 0 && y >= 0) {
+//                    select = !select;
+//                    Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
+//
+//                } else if (x >= 0 && y < 0) {
+//                    select = !select;
+//                    Toast.makeText(mContext, "第二象限", Toast.LENGTH_SHORT).show();
+//                } else if (x < 0 && y >= 0) {
+//                    select = !select;
+//                    Toast.makeText(mContext, "第三象限", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    select = !select;
+//                    Toast.makeText(mContext, "第四象限", Toast.LENGTH_SHORT).show();
+//                }
+//                if (x >= 0 && y >= 0) {
+//                    select = !select;
+//                    Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
+//                    invalidate();
+//                }
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
         }
         return super.onTouchEvent(event);
 
