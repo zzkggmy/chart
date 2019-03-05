@@ -1,5 +1,6 @@
 package com.example.chart.line_chart;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -41,6 +42,7 @@ public class LineChartView extends View {
     private Paint yPaint = new Paint();
     private Paint linePaint = new Paint();
     private Paint textPaint = new Paint();
+    private Paint mkPaint = new Paint();
     private Rect rect = new Rect();
     private double maxNum = 0;
     private List<LineChartBean.DataBean> datas = new ArrayList<>();
@@ -55,8 +57,8 @@ public class LineChartView extends View {
     private YAxisFormat yAxisFormat;
     private LineChartBean.SelectType selectType;
     private boolean clickEnable = true;
-    private float touchX = 0;
-    private float touchY = 0;
+    private float touchX = -100;
+    private float touchY = -100;
 
 
     public LineChartView(Context context, @Nullable AttributeSet attrs) {
@@ -76,6 +78,9 @@ public class LineChartView extends View {
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(dip2px(mContext, 12));
         selectPaint.setAntiAlias(true);
+        mkPaint.setAntiAlias(true);
+        mkPaint.setStyle(Paint.Style.STROKE);
+        mkPaint.setColor(Color.GRAY);
     }
 
     @Override
@@ -159,18 +164,21 @@ public class LineChartView extends View {
             if (clickEnable) {
                 switch (selectType) {
                     case all:
-                        textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
+                        textPaint.getTextBounds(roundFormat((baseY - touchY) / (baseY - endY) * maxNum), 0, roundFormat((baseY - touchY) / (baseY - endY) * maxNum).length(), rect);
                         float allTextWidth = rect.width();
                         float allTextHeight = rect.height();
-                        canvas.drawLine(touchX, baseY, touchX, endY, selectPaint);
+                        canvas.drawText(roundFormat((baseY - touchY) / (baseY - endY) * maxNum),touchX - allTextWidth / 2,endY + allTextHeight / 2 * 3,textPaint);
+                        canvas.drawRect(touchX - allTextWidth,endY,touchX + allTextWidth,endY + 2 * allTextHeight,mkPaint);
+                        canvas.drawLine(touchX, baseY, touchX, endY + allTextHeight * 2, selectPaint);
                         break;
                     case point:
                         if (index == i) {
-                            textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(datas.get(i).getNum()).length(), rect);
+                            textPaint.getTextBounds(String.valueOf(datas.get(i).getNum()), 0, String.valueOf(datas.get(i).getNum()).length(), rect);
                             float pointTextWidth = rect.width();
                             float pointTextHeight = rect.height();
-                            canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY - pointTextHeight, selectPaint);
-                            canvas.drawRoundRect(startX + i * averageX - pointTextWidth / 2,endY,startX + i * averageX + pointTextWidth / 2,endY - pointTextHeight,dip2px(mContext,10),dip2px(mContext,10),textPaint);
+                            canvas.drawRoundRect(startX + i * averageX - pointTextWidth, endY, startX + i * averageX + pointTextWidth, endY + pointTextHeight * 2, dip2px(mContext, 10), dip2px(mContext, 10), mkPaint);
+                            canvas.drawText(String.valueOf(datas.get(i).getNum()), startX + i * averageX - pointTextWidth / 2, endY + pointTextHeight / 2 * 3, selectPaint);
+                            canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY + pointTextHeight * 2, selectPaint);
                         }
                         break;
                 }
@@ -180,6 +188,7 @@ public class LineChartView extends View {
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float averageX = (endX - startX) / (datas.size() - 1);
@@ -230,7 +239,7 @@ public class LineChartView extends View {
         linePaint.setColor(lineChartBean.getLineColor());
         selectPaint.setStrokeWidth(dip2px(mContext, lineChartBean.getSelectPaintWidth()));
         selectPaint.setColor(lineChartBean.getSelectPaintColor());
-        this.selectType = lineChartBean.getSelectType() == null ? LineChartBean.SelectType.point: lineChartBean.getSelectType();
+        this.selectType = lineChartBean.getSelectType() == null ? LineChartBean.SelectType.point : lineChartBean.getSelectType();
         this.clickEnable = lineChartBean.isClickEnable();
     }
 
