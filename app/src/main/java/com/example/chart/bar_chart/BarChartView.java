@@ -186,9 +186,9 @@ public class BarChartView extends View {
         this.datas.clear();
         this.datas.addAll(barChartBean.getDatas());
         for (BarChartBean.DataBean value : barChartBean.getDatas()) {
-            if (value.getNum() > maxNum) maxNum = value.getNum();
+            if (value.getNum() > this.maxNum) this.maxNum = value.getNum();
         }
-        maxNum = maxNum + 3;
+        this.maxNum = this.maxNum + 3;
         this.yScale = barChartBean.getyScale();
         this.barWidth = dip2px(mContext, barChartBean.getBarWidth()) / 2;
         this.selectType = barChartBean.getSelectType();

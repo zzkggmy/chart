@@ -159,11 +159,18 @@ public class LineChartView extends View {
             if (clickEnable) {
                 switch (selectType) {
                     case all:
+                        textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
+                        float allTextWidth = rect.width();
+                        float allTextHeight = rect.height();
                         canvas.drawLine(touchX, baseY, touchX, endY, selectPaint);
                         break;
                     case point:
                         if (index == i) {
-                            canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY, selectPaint);
+                            textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(datas.get(i).getNum()).length(), rect);
+                            float pointTextWidth = rect.width();
+                            float pointTextHeight = rect.height();
+                            canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY - pointTextHeight, selectPaint);
+                            canvas.drawRoundRect(startX + i * averageX - pointTextWidth / 2,endY,startX + i * averageX + pointTextWidth / 2,endY - pointTextHeight,dip2px(mContext,10),dip2px(mContext,10),textPaint);
                         }
                         break;
                 }
