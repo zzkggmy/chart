@@ -47,6 +47,8 @@ public class BarChartView extends View {
     private BarChartBean.SelectType selectType;
     private float averageX = 0;
     private boolean clickEnable = true;
+    private int widthSize;
+    private int heightSize;
 
 
     public BarChartView(Context context, @Nullable AttributeSet attrs) {
@@ -74,8 +76,19 @@ public class BarChartView extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        Log.d("onMeasure", "wid   " + widthSize + "hei   " + heightSize);
+    }
+
+    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        Log.d("onLayout", "changed " + changed + "left   " + left + "top   " + top + "right   " + right + "bottom   " + bottom);
     }
 
     @Override
@@ -89,13 +102,24 @@ public class BarChartView extends View {
         this.startY = height;
         this.endX = width - dip2px(mContext, 15);
         this.endY = dip2px(mContext, 10);
-        baseY = height - dip2px(mContext, 30);
+        baseY = startY - dip2px(mContext, 30);
         averageX = (endX - startX) / (datas.size() + 1);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        float paddingLeft = getPaddingLeft();
+        float paddingRight = getPaddingRight();
+        float paddingTop = getPaddingTop();
+        float paddingBottom = getPaddingBottom();
+        float realWidth = getWidth() - getPaddingLeft() - getPaddingRight();
+        float realHeight = getHeight() - getPaddingTop() - getPaddingBottom();
+//        this.startX = startX + getPaddingLeft();
+//        this.endX = endX - getPaddingRight();
+//        this.startY = startY - getPaddingBottom();
+//        this.endY = endY + getPaddingTop();
+//        this.baseY = startY - dip2px(mContext, 30);
         drawX(canvas);
         drawY(canvas);
         drawBar(canvas);
@@ -196,6 +220,6 @@ public class BarChartView extends View {
         this.axisTextPaint.setColor(barChartBean.getAxisTextColor());
         this.axisTextPaint.setTextSize(dip2px(mContext, barChartBean.getAxisTextSize()));
         this.clickEnable = barChartBean.isClickEnable();
-        this.selectType = barChartBean.getSelectType() == null? BarChartBean.SelectType.zoom:barChartBean.getSelectType();
+        this.selectType = barChartBean.getSelectType() == null ? BarChartBean.SelectType.zoom : barChartBean.getSelectType();
     }
 }
