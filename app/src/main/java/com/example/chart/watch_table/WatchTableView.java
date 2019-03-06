@@ -6,12 +6,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import com.example.chart.LibUtils;
+
+import java.lang.ref.WeakReference;
 
 public class WatchTableView extends View {
     private Context mContext;
@@ -34,12 +38,19 @@ public class WatchTableView extends View {
     private Paint hourPaint = new Paint();
     private Paint minutePaint = new Paint();
     private Paint secondsPaint = new Paint();
+    private Paint textPaint = new Paint();
+    private Rect rect = new Rect();
+    private float centerRadius;
+    private float secondAngle = 0;
+    private float minuteAngle = 0;
+    private float hourAngle = 0;
+    private MyHandler myHandler = new MyHandler(this);
 
 
     public WatchTableView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
-        this.dialWidth = LibUtils.dip2px(context,4);
+        this.dialWidth = LibUtils.dip2px(context, 4);
         dialPaint.setAntiAlias(true);
         dialPaint.setStyle(Paint.Style.STROKE);
         dialPaint.setStrokeWidth(dialWidth);
@@ -68,6 +79,12 @@ public class WatchTableView extends View {
         secondsPaint.setStyle(Paint.Style.FILL);
         secondsPaint.setStrokeWidth(LibUtils.dip2px(context, 1));
         this.scaleWidth = LibUtils.dip2px(context, 1);
+        textPaint.setAntiAlias(true);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(LibUtils.dip2px(context, 12));
+        this.centerRadius = LibUtils.dip2px(context, 7);
+        myHandler.sendEmptyMessageDelayed(1024, 1000);
     }
 
     @Override
@@ -100,7 +117,7 @@ public class WatchTableView extends View {
         drawHour(canvas);
         drawMinute(canvas);
         drawSecond(canvas);
-        canvas.drawCircle(0, 0, LibUtils.dip2px(mContext, 5), centerPaint);
+        canvas.drawCircle(0, 0, centerRadius, centerPaint);
     }
 
     private void drawDial(Canvas canvas) {
@@ -109,21 +126,63 @@ public class WatchTableView extends View {
 
     private void drawScale(Canvas canvas) {
         for (int i = 1; i <= 12; i++) {
+            textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
+            float textWidth = rect.width();
+            float textHeight = rect.height();
             double angle = Math.toRadians(i * 30);
-            canvas.drawLine((radius - dialWidth / 2) * (float) (Math.sin(angle)), (radius - dialWidth / 2) * (float) (Math.cos(angle)), (radius - scaleLength - dialWidth / 2) * (float) (Math.sin(angle)), (radius - scaleLength - dialWidth / 2) * (float) (Math.cos(angle)), scalePaint);
+            canvas.drawLine(-(radius - dialWidth / 2) * (float) (Math.sin(angle)), -(radius - dialWidth / 2) * (float) (Math.cos(angle)), -(radius - scaleLength - dialWidth / 2) * (float) (Math.sin(angle)), -(radius - scaleLength - dialWidth / 2) * (float) (Math.cos(angle)), scalePaint);
+            float textX = ((radius - scaleLength - dialWidth) * (float) (Math.sin(angle)));
+            float textY = ((radius - scaleLength - dialWidth) * (float) (Math.cos(angle)));
+            canvas.drawText("" + (i), textX, textY, textPaint);
         }
     }
 
     private void drawHour(Canvas canvas) {
-        canvas.drawLine(0, 0, 0, radius / 2, hourPaint);
+        double angle = Math.toRadians(hourAngle);
+        canvas.drawLine(0, 0, (float) (Math.sin(angle) * (radius / 2)), (float) (Math.cos(angle) * (radius / 2)), hourPaint);
     }
 
     private void drawMinute(Canvas canvas) {
-        canvas.drawLine(0, 0, 0, -radius + LibUtils.dip2px(mContext, 20), minutePaint);
+        double angle = Math.toRadians(minuteAngle);
+        canvas.drawLine(0, 0, (float) (Math.sin(angle) * (LibUtils.dip2px(mContext, 40) - radius)), (float) (Math.cos(angle) * (LibUtils.dip2px(mContext, 40) - radius)), minutePaint);
     }
 
     private void drawSecond(Canvas canvas) {
-        canvas.drawLine(0, 0, radius - LibUtils.dip2px(mContext, 10), 0, secondsPaint);
+        double angle = Math.toRadians(secondAngle);
+        canvas.drawLine(0, 0, (float) (Math.sin(angle) * (radius - LibUtils.dip2px(mContext, 30))), (float) (Math.cos(angle) * (radius - LibUtils.dip2px(mContext, 30))), secondsPaint);
     }
 
+    private class MyHandler extends Handler {
+        WeakReference<WatchTableView> weakReference;
+
+        MyHandler(WatchTableView watchTableView) {
+            this.weakReference = new WeakReference<>(watchTableView);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1024:
+                    secondAngle -= 6;
+                    invalidate();
+                    if (secondAngle % -360 == 0) {
+                        secondAngle = 0;
+                        myHandler.sendEmptyMessage(1025);
+                    }
+                    myHandler.sendEmptyMessageDelayed(1024, 1000);
+                    break;
+                case 1025:
+                    minuteAngle -= 6;
+                    if (minuteAngle % -360 == 0)
+                        myHandler.sendEmptyMessage(1026);
+                    invalidate();
+                    break;
+                case 1026:
+                    hourAngle -= 30;
+                    invalidate();
+                    break;
+            }
+        }
+    }
 }
