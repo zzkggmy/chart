@@ -84,7 +84,7 @@ public class WatchTableView extends View {
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(LibUtils.dip2px(context, 12));
         this.centerRadius = LibUtils.dip2px(context, 7);
-        myHandler.sendEmptyMessageDelayed(1024, 1000);
+        myHandler.sendEmptyMessage(1024);
     }
 
     @Override
@@ -125,15 +125,17 @@ public class WatchTableView extends View {
     }
 
     private void drawScale(Canvas canvas) {
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 0; i < 12; i++) {
             textPaint.getTextBounds(String.valueOf(i), 0, String.valueOf(i).length(), rect);
             float textWidth = rect.width();
             float textHeight = rect.height();
-            double angle = Math.toRadians(i * 30);
-            canvas.drawLine(-(radius - dialWidth / 2) * (float) (Math.sin(angle)), -(radius - dialWidth / 2) * (float) (Math.cos(angle)), -(radius - scaleLength - dialWidth / 2) * (float) (Math.sin(angle)), -(radius - scaleLength - dialWidth / 2) * (float) (Math.cos(angle)), scalePaint);
-            float textX = ((radius - scaleLength - dialWidth) * (float) (Math.sin(angle)));
-            float textY = ((radius - scaleLength - dialWidth) * (float) (Math.cos(angle)));
-            canvas.drawText("" + (i), textX, textY, textPaint);
+            double xAngle = Math.toRadians(i * 30 );
+            double yAngle = Math.toRadians(i * 30 );
+            canvas.drawLine((radius - dialWidth / 2) * (float) (Math.sin(xAngle)), (radius - dialWidth / 2) * (float) (Math.cos(yAngle)), (radius - scaleLength - dialWidth / 2) * (float) (Math.sin(xAngle)), (radius - scaleLength - dialWidth / 2) * (float) (Math.cos(yAngle)), scalePaint);
+            float textX = ((radius - scaleLength - dialWidth) * (float) (Math.sin(xAngle)));
+            float textY = ((radius - scaleLength - dialWidth) * (float) (Math.cos(yAngle)));
+            canvas.drawText("" + (i + 1), textX, textY, textPaint);
+//            canvas.drawLine(0,0, (radius - dialWidth / 2) * (float) (Math.sin(Math.toRadians(0))),(radius - dialWidth / 2) * (float) (Math.sin(Math.toRadians(0))),scalePaint);
         }
     }
 

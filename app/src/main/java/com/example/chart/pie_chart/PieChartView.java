@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.floor;
 
 public class PieChartView extends View {
     private Context mContext;
@@ -40,6 +41,7 @@ public class PieChartView extends View {
     private float bigRadius = 0;
     private float circleRadius = 0;
     private float divideNum = 3;
+    private int index = -1;
 
     public PieChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -83,7 +85,7 @@ public class PieChartView extends View {
         this.height = h;
         bigRadius = (Math.min(w, h)) / 2;
         radius = bigRadius - 30;
-        circleRadius = radius / 2;
+        circleRadius = radius / 3;
     }
 
     @Override
@@ -97,35 +99,33 @@ public class PieChartView extends View {
         RectF oval = new RectF(-radius, -radius, radius, radius);
         RectF oval1 = new RectF(-bigRadius, -bigRadius, bigRadius, bigRadius);
         RectF oval2 = new RectF(-circleRadius - 25, -circleRadius - 25, circleRadius + 25, circleRadius + 25);
-        float startAngle = 0;
+        float startAngle = -90;
+        float textStartAngle = 0;
         float sweepAngle;
         float textAngle;
         for (int i = 0; i < datas.size(); i++) {
             withinPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
             paint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
-            canvas.drawArc(oval, startAngle, divideNum, true, dividePaint);
+            canvas.drawArc(oval, -startAngle, -divideNum, true, dividePaint);
             startAngle += divideNum;
+            textStartAngle += divideNum;
             sweepAngle = (float) (datas.get(i).getPercent() / allNum * (360 - datas.size() * divideNum));
             PieBaseData pieBaseData = new PieBaseData();
             pieBaseData.setStartAngle(startAngle);
             pieBaseData.setSweepAngle(sweepAngle);
             pieList.add(pieBaseData);
-            paint.setAlpha(225);
-            if (select)
-                canvas.drawArc(oval1, startAngle, sweepAngle, true, paint);
+            if (select && index == i)
+                canvas.drawArc(oval1, -startAngle, -sweepAngle, true, paint);
             else
-                canvas.drawArc(oval, startAngle, sweepAngle, true, paint);
-            withinPaint.setAlpha(10);
-            canvas.drawArc(oval2, startAngle, sweepAngle, true, withinPaint);
+                canvas.drawArc(oval, -startAngle, -sweepAngle, true, paint);
+            canvas.drawArc(oval2, -startAngle, -sweepAngle, true, withinPaint);
             //文字角度
-            textAngle = startAngle + sweepAngle / 2;
-            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
-//            float x = (float) (radius * Math.cos(textAngle * PI / 180));    //计算文字位置坐标
-//            float y = (float) (radius * Math.sin(textAngle * PI / 180));
-////            textAngle = startAngle + sweepAngle / 2;
-////            getTextPoint(textAngle, canvas, "这是第" + (i + 1) + "条数据");
-//            canvas.drawText("这是第" + (i + 1) + "条数据",x / 2,y,textPaint);
+            textAngle = textStartAngle + sweepAngle / 2;
+            float y = (float) (radius / 2 * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
+            float x = (float) (radius / 2 * Math.sin(Math.toRadians(textAngle)));
+            canvas.drawText("" + (-startAngle), x, y, textPaint);
             startAngle += sweepAngle;
+            textStartAngle += sweepAngle;
         }
         canvas.drawCircle(0, 0, circleRadius, circlePaint);
     }
@@ -138,53 +138,6 @@ public class PieChartView extends View {
         }
     }
 
-
-    public void getTextPoint(float degree, Canvas canvas, String text) {
-        float dx;
-        float dy;
-        if (degree >= 0 && degree <= 90) {
-            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));//注意Math.sin(x)中x为弧度值，并非数学中的角度，所以需要将角度转换为弧度
-            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
-        } else if (degree > 90 && degree <= 180) {
-            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (180f - degree)));
-            dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (180f - degree)));
-        } else if (degree > 180 && degree <= 270) {
-            dx = (float) -(radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (270f - degree)));
-            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (270f - degree)));
-        } else {
-            dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * (360f - degree)));
-            dy = (float) -(radius * 2.7 / 3 * Math.sin(radius * PI / 180 * (360f - degree)));
-        }
-//        dx = (float) (radius * 2.3 / 3 * Math.cos(radius * PI / 180 * degree));
-//        dy = (float) (radius * 2.7 / 3 * Math.sin(radius * PI / 180 * degree));
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(30f);
-        canvas.drawText(text, dx, dy, textPaint);
-//            switch ((int) degree / 90) {
-//                //第一象限内
-//                case 0:
-//                    p.x = (radius * (float) Math.cos(Math.toRadians(degree)));
-//                    p.y = (radius * (float) Math.sin(Math.toRadians(degree)));
-//                    break;
-//                //第二象限内
-//                case 1:
-//                    p.x = (radius * (float) Math.sin(Math.toRadians(degree - 90)));
-//                    p.y = (radius * (float) Math.cos(Math.toRadians(degree - 90)));
-//                    break;
-//                //第三象限内
-//                case 2:
-//                    p.x = (radius * (float) Math.cos(Math.toRadians(degree - 180)));
-//                    p.y = (radius * (float) Math.sin(Math.toRadians(degree - 180)));
-//                    break;
-//                //第四象限内
-//                case 3:
-//                    p.x = radius * (float) Math.sin(Math.toRadians(degree - 270));
-//                    p.y = radius * (float) Math.cos(Math.toRadians(degree - 270));
-//                    break;
-//            }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -194,61 +147,23 @@ public class PieChartView extends View {
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_DOWN:
-                float startAngle = 0;
+                float startAngle = -90;
                 float sweepAngle;
-                Log.d("x + y  " ,"X :  " + x  + "Y : " + y);
-//                for (int i = 0; i < datas.size(); i++) {
-//                    startAngle += divideNum;
-//                    sweepAngle = (float) (datas.get(i).getPercent() / allNum * (360 - datas.size() * divideNum));
-//
-//                    startAngle += sweepAngle;
-//                    switch ((int) startAngle / 90) {
-//                        //第一象限内
-//                        case 0:
-//                            Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
-////                            p.x = (radius * (float) Math.cos(Math.toRadians(degree)));
-////                            p.y = (radius * (float) Math.sin(Math.toRadians(degree)));
-//                            break;
-//                        //第二象限内
-//                        case 1:
-//                            Toast.makeText(mContext, "第二象限", Toast.LENGTH_SHORT).show();
-////                            p.x = (radius * (float) Math.sin(Math.toRadians(degree - 90)));
-////                            p.y = (radius * (float) Math.cos(Math.toRadians(degree - 90)));
-//                            break;
-//                        //第三象限内
-//                        case 2:
-//                            Toast.makeText(mContext, "第三象限", Toast.LENGTH_SHORT).show();
-////                            p.x = (radius * (float) Math.cos(Math.toRadians(degree - 180)));
-////                            p.y = (radius * (float) Math.sin(Math.toRadians(degree - 180)));
-//                            break;
-//                        //第四象限内
-//                        case 3:
-//                            Toast.makeText(mContext, "第四象限", Toast.LENGTH_SHORT).show();
-////                            p.x = radius * (float) Math.sin(Math.toRadians(degree - 270));
-////                            p.y = radius * (float) Math.cos(Math.toRadians(degree - 270));
-//                            break;
-//                    }
-//                }
-
-//                if (x >= 0 && y >= 0) {
-//                    select = !select;
-//                    Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
-//
-//                } else if (x >= 0 && y < 0) {
-//                    select = !select;
-//                    Toast.makeText(mContext, "第二象限", Toast.LENGTH_SHORT).show();
-//                } else if (x < 0 && y >= 0) {
-//                    select = !select;
-//                    Toast.makeText(mContext, "第三象限", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    select = !select;
-//                    Toast.makeText(mContext, "第四象限", Toast.LENGTH_SHORT).show();
-//                }
-//                if (x >= 0 && y >= 0) {
-//                    select = !select;
-//                    Toast.makeText(mContext, "第一象限", Toast.LENGTH_SHORT).show();
-//                    invalidate();
-//                }
+                float angle;
+                float x1;
+                float y1;
+                x1 = (float) (x * radius / Math.abs(Math.sqrt(x * x + y * y)));
+                y1 = (float) (y * radius / Math.abs(Math.sqrt(x * x + y * y)));
+                angle = -((float) (Math.asin(x1 / Math.abs(Math.sqrt((x1 * x1 + y1 * y1))))) - 1) * 360;
+                for (int i = 0; i < datas.size(); i++) {
+                    startAngle += divideNum;
+                    sweepAngle = (float) (datas.get(i).getPercent() / allNum * (360 - datas.size() * divideNum));
+                    if (angle <= -startAngle && angle >= -startAngle - sweepAngle) {
+                        select = !select;
+                        index = i;
+                    }
+                    startAngle += sweepAngle;
+                }
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:

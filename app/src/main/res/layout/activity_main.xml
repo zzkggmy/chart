@@ -9,7 +9,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="200dp">
+        android:paddingTop="700dp">
 
         <com.example.chart.pie_chart.PieChartView
             android:id="@+id/pie_chart"
@@ -29,7 +29,6 @@
 
         <com.example.chart.watch_table.WatchTableView
             android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:layout_margin="10dp" />
+            android:layout_height="500dp" />
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
