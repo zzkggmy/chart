@@ -1,7 +1,6 @@
 package com.example.chart.pie_chart;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -38,27 +37,15 @@ public class PieChartView extends View {
     private float divideNum = 3;
     private int index = -1;
     private float shadowRadius;
+    private float textMarginStart;
+
+    private int textColor;
 
     private PieChartBean.TextShowType textShowType;
 
     public PieChartView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        shadowPaint.setAntiAlias(true);
-        shadowPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        textPaint.setAntiAlias(true);
-        textPaint.setColor(Color.BLACK);
-        textPaint.setStyle(Paint.Style.FILL);
-        textPaint.setTextSize(20f);
-        circlePaint.setAntiAlias(true);
-        circlePaint.setColor(Color.WHITE);
-        circlePaint.setStyle(Paint.Style.FILL);
-        dividePaint.setAntiAlias(true);
-        dividePaint.setColor(Color.TRANSPARENT);
-        dividePaint.setStyle(Paint.Style.FILL);
     }
 
 
@@ -75,11 +62,30 @@ public class PieChartView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        initPaint();
         this.width = w;
         this.height = h;
         selectRadius = (Math.min(w, h)) / 2;
         radius = selectRadius - 30;
         circleRadius = circleRadius == 0 ? radius / 3 : LibUtils.dip2px(mContext, circleRadius);
+    }
+
+    private void initPaint() {
+        paint.setAntiAlias(true);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        shadowPaint.setAntiAlias(true);
+        shadowPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(textColor);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setTextSize(20f);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setColor(Color.WHITE);
+        circlePaint.setStyle(Paint.Style.FILL);
+        dividePaint.setAntiAlias(true);
+        dividePaint.setColor(Color.TRANSPARENT);
+        dividePaint.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -103,7 +109,6 @@ public class PieChartView extends View {
                     shadowPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
                     shadowPaint.setAlpha(25);
                     paint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
-                    paint.setAlpha(100);
                     canvas.drawArc(oval, -startAngle, -divideNum, true, dividePaint);
                     startAngle += divideNum;
                     textStartAngle += divideNum;
@@ -112,18 +117,18 @@ public class PieChartView extends View {
                     pieBaseData.setStartAngle(startAngle);
                     pieBaseData.setSweepAngle(sweepAngle);
                     pieList.add(pieBaseData);
+                    canvas.drawArc(oval2, -startAngle, -sweepAngle, true, shadowPaint);
                     if (select && index == i)
                         canvas.drawArc(oval1, -startAngle, -sweepAngle, true, paint);
                     else
                         canvas.drawArc(oval, -startAngle, -sweepAngle, true, paint);
-                    canvas.drawArc(oval2, -startAngle, -sweepAngle, true, shadowPaint);
                     //文字角度
                     textAngle = textStartAngle + sweepAngle / 2;
                     Path path = new Path();
                     float endTextY = (float) ((radius - LibUtils.dip2px(mContext, 5)) * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
                     float endTextX = (float) ((radius - LibUtils.dip2px(mContext, 5)) * Math.sin(Math.toRadians(textAngle)));
-                    float startTextY = (float) (circleRadius * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
-                    float startTextX = (float) (circleRadius * Math.sin(Math.toRadians(textAngle)));
+                    float startTextY = (float) ((circleRadius +textMarginStart) * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
+                    float startTextX = (float) ((circleRadius + textMarginStart) * Math.sin(Math.toRadians(textAngle)));
                     path.rMoveTo(startTextX, startTextY);
                     path.lineTo(endTextX, endTextY);
                     canvas.drawTextOnPath("" + (-startAngle), path, 10, 10, textPaint);
@@ -143,11 +148,11 @@ public class PieChartView extends View {
                     pieBaseData.setStartAngle(startAngle);
                     pieBaseData.setSweepAngle(sweepAngle);
                     pieList.add(pieBaseData);
+                    canvas.drawArc(oval2, -startAngle, -sweepAngle, true, shadowPaint);
                     if (select && index == i)
                         canvas.drawArc(oval1, -startAngle, -sweepAngle, true, paint);
                     else
                         canvas.drawArc(oval, -startAngle, -sweepAngle, true, paint);
-                    canvas.drawArc(oval2, -startAngle, -sweepAngle, true, shadowPaint);
                     //文字角度
                     textAngle = textStartAngle + sweepAngle / 2;
                     float y = (float) (radius / 2 * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
@@ -170,6 +175,8 @@ public class PieChartView extends View {
         this.circleRadius = pieChartBean.getCircleRadius();
         this.textShowType = pieChartBean.getTextShowType();
         this.shadowRadius = this.circleRadius + LibUtils.dip2px(mContext, pieChartBean.getShadowWidth());
+        this.textMarginStart = LibUtils.dip2px(mContext,pieChartBean.getTextMarginStart());
+        this.textColor = pieChartBean.getTextColor();
     }
 
     @Override

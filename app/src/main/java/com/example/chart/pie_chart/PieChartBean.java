@@ -1,16 +1,28 @@
 package com.example.chart.pie_chart;
 
+import android.graphics.Color;
+
 import java.util.List;
 
 public class PieChartBean {
     private float divideNum;
     private TextShowType textShowType;
     private float textSize;
-    private int textColor;
+    private int textColor = Color.WHITE;
     private List<DataBean> datas;
     private float circleRadius = 0;
 
     private float shadowWidth = 25;
+
+    private float textMarginStart = 20;
+
+    public float getTextMarginStart() {
+        return textMarginStart;
+    }
+
+    public void setTextMarginStart(float textMarginStart) {
+        this.textMarginStart = textMarginStart;
+    }
 
     public float getCircleRadius() {
         return circleRadius;
