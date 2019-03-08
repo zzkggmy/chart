@@ -26,6 +26,7 @@ public class PieChartView extends View {
     private Paint textPaint = new Paint();
     private Paint circlePaint = new Paint();
     private Paint dividePaint = new Paint();
+    private Paint pathPaint = new Paint();
 
     private float allNum = 0F;
     private List<PieChartBean.DataBean> datas = new ArrayList<>();
@@ -38,6 +39,8 @@ public class PieChartView extends View {
     private int index = -1;
     private float shadowRadius;
     private float textMarginStart;
+    private float extensionLength = 0;
+    private float cornerLength = 0;
 
     private int textColor;
 
@@ -68,6 +71,8 @@ public class PieChartView extends View {
         selectRadius = (Math.min(w, h)) / 2;
         radius = selectRadius - 30;
         circleRadius = circleRadius == 0 ? radius / 3 : LibUtils.dip2px(mContext, circleRadius);
+        this.extensionLength = LibUtils.dip2px(mContext, 5);
+        this.cornerLength = LibUtils.dip2px(mContext, 10);
     }
 
     private void initPaint() {
@@ -86,6 +91,10 @@ public class PieChartView extends View {
         dividePaint.setAntiAlias(true);
         dividePaint.setColor(Color.TRANSPARENT);
         dividePaint.setStyle(Paint.Style.FILL);
+        pathPaint.setAntiAlias(true);
+        pathPaint.setColor(Color.BLACK);
+        pathPaint.setStyle(Paint.Style.STROKE);
+        pathPaint.setStrokeWidth(LibUtils.dip2px(mContext, 1));
     }
 
     @Override
@@ -127,11 +136,44 @@ public class PieChartView extends View {
                     Path path = new Path();
                     float endTextY = (float) ((radius - LibUtils.dip2px(mContext, 5)) * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
                     float endTextX = (float) ((radius - LibUtils.dip2px(mContext, 5)) * Math.sin(Math.toRadians(textAngle)));
-                    float startTextY = (float) ((circleRadius +textMarginStart) * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
+                    float startTextY = (float) ((circleRadius + textMarginStart) * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
                     float startTextX = (float) ((circleRadius + textMarginStart) * Math.sin(Math.toRadians(textAngle)));
                     path.rMoveTo(startTextX, startTextY);
                     path.lineTo(endTextX, endTextY);
                     canvas.drawTextOnPath("" + (-startAngle), path, 10, 10, textPaint);
+                    startAngle += sweepAngle;
+                    textStartAngle += sweepAngle;
+                }
+                break;
+            case Extension:
+                for (int i = 0; i < datas.size(); i++) {
+                    shadowPaint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
+                    paint.setColor(mContext.getResources().getColor(datas.get(i).getColor()));
+                    canvas.drawArc(oval, -startAngle, -divideNum, true, dividePaint);
+                    startAngle += divideNum;
+                    textStartAngle += divideNum;
+                    sweepAngle = (float) (datas.get(i).getNum() / allNum * (360 - datas.size() * divideNum));
+                    PieBaseData pieBaseData = new PieBaseData();
+                    pieBaseData.setStartAngle(startAngle);
+                    pieBaseData.setSweepAngle(sweepAngle);
+                    pieList.add(pieBaseData);
+                    canvas.drawArc(oval2, -startAngle, -sweepAngle, true, shadowPaint);
+                    if (select && index == i)
+                        canvas.drawArc(oval1, -startAngle, -sweepAngle, true, paint);
+                    else
+                        canvas.drawArc(oval, -startAngle, -sweepAngle, true, paint);
+                    //文字角度
+                    textAngle = textStartAngle + sweepAngle / 2;
+                    Path path = new Path();
+                    float lastY = (float) ((radius / 12 * 13) * Math.cos(Math.toRadians(textAngle)));
+                    float endY = lastY >= 0 ? lastY + cornerLength : lastY - cornerLength;
+                    path.rMoveTo((float) ((radius / 12 * 11) * Math.sin(Math.toRadians(textAngle))), (float) ((radius / 12 * 11) * Math.cos(Math.toRadians(textAngle))));
+                    path.lineTo((float) ((radius / 12 * 13) * Math.sin(Math.toRadians(textAngle))), (float) ((radius / 12 * 13) * Math.cos(Math.toRadians(textAngle))));
+                    path.lineTo((float) ((radius / 12 * 13) * Math.sin(Math.toRadians(textAngle))), lastY + cornerLength);
+                    canvas.drawPath(path, pathPaint);
+                    float y = (float) (radius / 2 * Math.cos(Math.toRadians(textAngle)));    //计算文字位置坐标
+                    float x = (float) (radius / 2 * Math.sin(Math.toRadians(textAngle)));
+                    canvas.drawText("" + (-startAngle), (float) ((radius / 12 * 13) * Math.sin(Math.toRadians(textAngle))), lastY + cornerLength, textPaint);
                     startAngle += sweepAngle;
                     textStartAngle += sweepAngle;
                 }
@@ -175,7 +217,7 @@ public class PieChartView extends View {
         this.circleRadius = pieChartBean.getCircleRadius();
         this.textShowType = pieChartBean.getTextShowType();
         this.shadowRadius = this.circleRadius + LibUtils.dip2px(mContext, pieChartBean.getShadowWidth());
-        this.textMarginStart = LibUtils.dip2px(mContext,pieChartBean.getTextMarginStart());
+        this.textMarginStart = LibUtils.dip2px(mContext, pieChartBean.getTextMarginStart());
         this.textColor = pieChartBean.getTextColor();
     }
 
