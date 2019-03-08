@@ -8,7 +8,7 @@ public class PieChartBean {
     private float divideNum;
     private TextShowType textShowType;
     private float textSize;
-    private int textColor = Color.BLACK;
+    private int textColor = Color.WHITE;
     private List<DataBean> datas;
     private float circleRadius = 0;
 

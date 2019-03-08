@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             lineList.add(lineBean);
         }
         pieChartBean.setDatas(pieList);
-        pieChartBean.setTextShowType(PieChartBean.TextShowType.Extension);
+        pieChartBean.setTextShowType(PieChartBean.TextShowType.FollowArc);
 
 
         lineChartBean.setxAxis(5);
