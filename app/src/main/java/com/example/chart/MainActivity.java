@@ -64,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
         otherDataBean1.setColor(colors[0]);
         otherDataBean1.setOthersNumList(list1);
 
-        otherDataBean2.setColor(colors[1]);
+        otherDataBean2.setColor(colors[9]);
         otherDataBean2.setOthersNumList(list2);
 
-        otherDataBean3.setColor(colors[2]);
+        otherDataBean3.setColor(colors[8]);
         otherDataBean3.setOthersNumList(list3);
 
         otherData.add(otherDataBean1);
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         otherData.add(otherDataBean3);
         lineChartBean.setOtherData(otherData);
 
+        lineChartBean.setOtherLineWidth(2);
         lineChartBean.setxAxis(5);
         lineChartBean.setyAxis(5);
         lineChartBean.setDatas(lineList);

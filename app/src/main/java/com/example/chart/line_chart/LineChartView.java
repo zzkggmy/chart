@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.chart.LibUtils;
 import com.example.chart.XAxisFormat;
 import com.example.chart.YAxisFormat;
 
@@ -265,6 +266,7 @@ public class LineChartView extends View {
         selectPaint.setColor(mContext.getResources().getColor(lineChartBean.getSelectPaintColor()));
         this.selectType = lineChartBean.getSelectType() == null ? LineChartBean.SelectType.point : lineChartBean.getSelectType();
         this.clickEnable = lineChartBean.isClickEnable();
+        this.otherLinePaint.setStrokeWidth(LibUtils.dip2px(mContext, lineChartBean.getOtherLineWidth()));
     }
 
     private String roundFormat(Double value) {

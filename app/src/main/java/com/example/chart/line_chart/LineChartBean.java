@@ -23,6 +23,16 @@ public class LineChartBean {
 
     private int selectPaintColor;
 
+    private float otherLineWidth;
+
+    public float getOtherLineWidth() {
+        return otherLineWidth;
+    }
+
+    public void setOtherLineWidth(float otherLineWidth) {
+        this.otherLineWidth = otherLineWidth;
+    }
+
     public boolean isClickEnable() {
         return clickEnable;
     }
