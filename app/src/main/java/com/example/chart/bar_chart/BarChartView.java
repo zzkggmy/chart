@@ -217,7 +217,7 @@ public class BarChartView extends View {
         this.yScale = barChartBean.getyScale();
         this.barWidth = dip2px(mContext, barChartBean.getBarWidth()) / 2;
         this.selectType = barChartBean.getSelectType();
-        this.axisTextPaint.setColor(barChartBean.getAxisTextColor());
+        this.axisTextPaint.setColor(barChartBean.getAxisTextColor() == Color.BLACK ? Color.BLACK : mContext.getResources().getColor(barChartBean.getAxisTextColor()));
         this.axisTextPaint.setTextSize(dip2px(mContext, barChartBean.getAxisTextSize()));
         this.clickEnable = barChartBean.isClickEnable();
         this.selectType = barChartBean.getSelectType() == null ? BarChartBean.SelectType.zoom : barChartBean.getSelectType();

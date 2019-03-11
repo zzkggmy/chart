@@ -1,5 +1,7 @@
 package com.example.chart.bar_chart;
 
+import android.graphics.Color;
+
 import java.util.List;
 
 public class BarChartBean {
@@ -8,7 +10,7 @@ public class BarChartBean {
     private float barWidth;
     private int yScale;
     private float axisTextSize;
-    private int axisTextColor;
+    private int axisTextColor = Color.BLACK;
     private SelectType selectType = SelectType.zoom;
     private boolean clickEnable = true;
 

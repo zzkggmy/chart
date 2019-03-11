@@ -43,9 +43,11 @@ public class LineChartView extends View {
     private Paint linePaint = new Paint();
     private Paint textPaint = new Paint();
     private Paint mkPaint = new Paint();
+    private Paint otherLinePaint = new Paint();
     private Rect rect = new Rect();
     private double maxNum = 0;
-    private List<LineChartBean.DataBean> datas = new ArrayList<>();
+    private List<Double> datas = new ArrayList<>();
+    private List<LineChartBean.OtherDataBean> othersData = new ArrayList<>();
     private double xAxis = 0;
     private double yAxis = 0;
     private double xAxisMaxNum = 0;
@@ -81,6 +83,8 @@ public class LineChartView extends View {
         mkPaint.setAntiAlias(true);
         mkPaint.setStyle(Paint.Style.STROKE);
         mkPaint.setColor(Color.GRAY);
+        otherLinePaint.setAntiAlias(true);
+        otherLinePaint.setStyle(Paint.Style.STROKE);
     }
 
     @Override
@@ -158,26 +162,26 @@ public class LineChartView extends View {
         float averageX = (endX - startX) / (datas.size() - 1);
         double averageYNum = maxNum / datas.size();
         Path path = new Path();
-        path.rMoveTo(startX, (float) (baseY - datas.get(0).getNum() / averageYNum * itemHeight));
+        path.rMoveTo(startX, (float) (baseY - datas.get(0) / averageYNum * itemHeight));
         for (int i = 0; i < datas.size(); i++) {
-            path.lineTo(startX + i * averageX, (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight));
+            path.lineTo(startX + i * averageX, (float) (baseY - (datas.get(i) / averageYNum) * itemHeight));
             if (clickEnable) {
                 switch (selectType) {
                     case all:
                         textPaint.getTextBounds(roundFormat((baseY - touchY) / (baseY - endY) * maxNum), 0, roundFormat((baseY - touchY) / (baseY - endY) * maxNum).length(), rect);
                         float allTextWidth = rect.width();
                         float allTextHeight = rect.height();
-                        canvas.drawText(roundFormat((baseY - touchY) / (baseY - endY) * maxNum),touchX - allTextWidth / 2,endY + allTextHeight / 2 * 3,textPaint);
-                        canvas.drawRect(touchX - allTextWidth,endY,touchX + allTextWidth,endY + 2 * allTextHeight,mkPaint);
+                        canvas.drawText(roundFormat((baseY - touchY) / (baseY - endY) * maxNum), touchX - allTextWidth / 2, endY + allTextHeight / 2 * 3, textPaint);
+                        canvas.drawRect(touchX - allTextWidth, endY, touchX + allTextWidth, endY + 2 * allTextHeight, mkPaint);
                         canvas.drawLine(touchX, baseY, touchX, endY + allTextHeight * 2, selectPaint);
                         break;
                     case point:
                         if (index == i) {
-                            textPaint.getTextBounds(String.valueOf(datas.get(i).getNum()), 0, String.valueOf(datas.get(i).getNum()).length(), rect);
+                            textPaint.getTextBounds(String.valueOf(datas.get(i)), 0, String.valueOf(datas.get(i)).length(), rect);
                             float pointTextWidth = rect.width();
                             float pointTextHeight = rect.height();
                             canvas.drawRoundRect(startX + i * averageX - pointTextWidth, endY, startX + i * averageX + pointTextWidth, endY + pointTextHeight * 2, dip2px(mContext, 10), dip2px(mContext, 10), mkPaint);
-                            canvas.drawText(String.valueOf(datas.get(i).getNum()), startX + i * averageX - pointTextWidth / 2, endY + pointTextHeight / 2 * 3, selectPaint);
+                            canvas.drawText(String.valueOf(datas.get(i)), startX + i * averageX - pointTextWidth / 2, endY + pointTextHeight / 2 * 3, selectPaint);
                             canvas.drawLine(startX + i * averageX, baseY, startX + i * averageX, endY + pointTextHeight * 2, selectPaint);
                         }
                         break;
@@ -185,6 +189,19 @@ public class LineChartView extends View {
             }
         }
         canvas.drawPath(path, linePaint);
+        drawOthersLine(canvas, averageX, averageYNum);
+    }
+
+    private void drawOthersLine(Canvas canvas, float averageX, double averageYNum) {
+        for (int i = 0; i < othersData.size(); i++) {
+            otherLinePaint.setColor(mContext.getResources().getColor(othersData.get(i).getColor()));
+            Path path = new Path();
+            path.rMoveTo(startX, (float) (baseY - othersData.get(i).getOthersNumList().get(0) / averageYNum * itemHeight));
+            for (int j = 0; j < othersData.get(i).getOthersNumList().size(); j++) {
+                path.lineTo(startX + j * averageX, (float) (baseY - (othersData.get(i).getOthersNumList().get(j) / averageYNum) * itemHeight));
+            }
+            canvas.drawPath(path, otherLinePaint);
+        }
     }
 
 
@@ -203,7 +220,7 @@ public class LineChartView extends View {
                     switch (selectType) {
                         case point:
                             if (x <= startX + i * averageX + dip2px(mContext, 8) && x >= startX + i * averageX - dip2px(mContext, 8)) {
-                                if (y <= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) + dip2px(mContext, 8) && y >= (float) (baseY - (datas.get(i).getNum() / averageYNum) * itemHeight) - dip2px(mContext, 8))
+                                if (y <= (float) (baseY - (datas.get(i) / averageYNum) * itemHeight) + dip2px(mContext, 8) && y >= (float) (baseY - (datas.get(i) / averageYNum) * itemHeight) - dip2px(mContext, 8))
                                     index = i;
                             }
                             break;
@@ -228,17 +245,24 @@ public class LineChartView extends View {
     public void setData(LineChartBean lineChartBean) {
         this.datas.clear();
         this.datas.addAll(lineChartBean.getDatas());
-        for (LineChartBean.DataBean value : lineChartBean.getDatas()) {
-            if (value.getNum() > maxNum) maxNum = value.getNum();
+        for (Double value : lineChartBean.getDatas()) {
+            if (value > maxNum) maxNum = value;
+        }
+        this.othersData.clear();
+        this.othersData.addAll(lineChartBean.getOtherData());
+        for (LineChartBean.OtherDataBean listBean : lineChartBean.getOtherData()) {
+            for (Double otherValue : listBean.getOthersNumList()) {
+                if (otherValue >= maxNum) maxNum = otherValue;
+            }
         }
         maxNum = maxNum + 3;
         this.xAxis = lineChartBean.getxAxis();
         this.yAxis = lineChartBean.getyAxis();
         this.xAxisMaxNum = lineChartBean.getxAxisMaxNum();
         this.yAxisMaxNum = lineChartBean.getyAxisMaxNum();
-        linePaint.setColor(lineChartBean.getLineColor());
+        linePaint.setColor(mContext.getResources().getColor(lineChartBean.getLineColor()));
         selectPaint.setStrokeWidth(dip2px(mContext, lineChartBean.getSelectPaintWidth()));
-        selectPaint.setColor(lineChartBean.getSelectPaintColor());
+        selectPaint.setColor(mContext.getResources().getColor(lineChartBean.getSelectPaintColor()));
         this.selectType = lineChartBean.getSelectType() == null ? LineChartBean.SelectType.point : lineChartBean.getSelectType();
         this.clickEnable = lineChartBean.isClickEnable();
     }

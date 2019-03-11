@@ -25,8 +25,15 @@ public class MainActivity extends AppCompatActivity {
     private List<BarChartBean.DataBean> barList = new ArrayList<>();
     private BarChartBean barChartBean = new BarChartBean();
 
-    private List<LineChartBean.DataBean> lineList = new ArrayList<>();
+    private List<Double> lineList = new ArrayList<>();
     private LineChartBean lineChartBean = new LineChartBean();
+    private List<Double> list1 = new ArrayList<>();
+    private List<Double> list2 = new ArrayList<>();
+    private List<Double> list3 = new ArrayList<>();
+    private LineChartBean.OtherDataBean otherDataBean1 = new LineChartBean.OtherDataBean();
+    private LineChartBean.OtherDataBean otherDataBean2 = new LineChartBean.OtherDataBean();
+    private LineChartBean.OtherDataBean otherDataBean3 = new LineChartBean.OtherDataBean();
+    private List<LineChartBean.OtherDataBean> otherData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,33 +48,45 @@ public class MainActivity extends AppCompatActivity {
             pieDataBean.setNum(nums[i]);
             pieList.add(pieDataBean);
 
-
             BarChartBean.DataBean dataBean = new BarChartBean.DataBean();
             dataBean.setColor(colors[i]);
             dataBean.setNum(nums[i]);
             barList.add(dataBean);
-
-            LineChartBean.DataBean lineBean = new LineChartBean.DataBean();
-            lineBean.setColor(colors[i]);
-            lineBean.setNum(nums[i]);
-            lineList.add(lineBean);
+            list1.add(nums[i] * 0.5);
+            list2.add(nums[i] * 1.5);
+            list3.add(nums[i] * 2.0);
+            lineList.add(nums[i]);
         }
         pieChartBean.setDatas(pieList);
         pieChartBean.setTextShowType(PieChartBean.TextShowType.FollowArc);
 
 
+        otherDataBean1.setColor(colors[0]);
+        otherDataBean1.setOthersNumList(list1);
+
+        otherDataBean2.setColor(colors[1]);
+        otherDataBean2.setOthersNumList(list2);
+
+        otherDataBean3.setColor(colors[2]);
+        otherDataBean3.setOthersNumList(list3);
+
+        otherData.add(otherDataBean1);
+        otherData.add(otherDataBean2);
+        otherData.add(otherDataBean3);
+        lineChartBean.setOtherData(otherData);
+
         lineChartBean.setxAxis(5);
         lineChartBean.setyAxis(5);
         lineChartBean.setDatas(lineList);
         lineChartBean.setxAxisMaxNum(100);
-        lineChartBean.setSelectPaintColor(this.getResources().getColor(R.color.color_BD10E0));
+        lineChartBean.setSelectPaintColor(R.color.color_BD10E0);
         lineChartBean.setSelectPaintWidth(2);
-        lineChartBean.setLineColor(getResources().getColor(R.color.color_73DC1D));
+        lineChartBean.setLineColor(R.color.color_73DC1D);
         lineChartBean.setClickEnable(true);
         lineChartBean.setSelectType(LineChartBean.SelectType.all);
 
 
-        barChartBean.setAxisTextColor(getResources().getColor(R.color.black_3));
+        barChartBean.setAxisTextColor(R.color.black_3);
         barChartBean.setAxisTextSize(12);
         barChartBean.setyScale(4);
         barChartBean.setBarWidth(20);
